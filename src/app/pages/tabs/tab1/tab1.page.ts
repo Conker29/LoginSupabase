@@ -15,6 +15,7 @@ import {
   IonImg
 } from '@ionic/angular/standalone';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Toast } from '@capacitor/toast';
 
 @Component({
   selector: 'app-tab1',
@@ -60,8 +61,19 @@ export class Tab1Page implements OnInit {
 
       this.photos = [imageUrl, ...this.photos];
       localStorage.setItem('tab1_photos', JSON.stringify(this.photos));
+
+      await Toast.show({
+        text: 'Foto capturada y guardada en la galería',
+        duration: 'short',
+        position: 'bottom'
+      });
     } catch (error) {
       console.error('Error al tomar la foto', error);
+      await Toast.show({
+        text: 'Error al capturar la foto',
+        duration: 'short',
+        position: 'bottom'
+      });
     }
   }
 

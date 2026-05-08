@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { SupabaseService } from '../../../services/supabase.service';
+import { Toast } from '@capacitor/toast';
 import {
   IonHeader,
   IonToolbar,
@@ -39,8 +40,22 @@ export class Tab3Page {
   ) {}
 
   async logout() {
-    await this.supabaseService.logout();
-    this.router.navigateByUrl('/login');
+    try {
+      await this.supabaseService.logout();
+      await Toast.show({
+        text: 'Sesión cerrada exitosamente',
+        duration: 'short',
+        position: 'bottom'
+      });
+      this.router.navigateByUrl('/login');
+    } catch (error) {
+      console.error('Error al cerrar sesión', error);
+      await Toast.show({
+        text: 'Error al cerrar sesión',
+        duration: 'short',
+        position: 'bottom'
+      });
+    }
   }
 }
 
