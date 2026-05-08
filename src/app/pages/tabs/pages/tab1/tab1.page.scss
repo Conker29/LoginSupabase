@@ -1,49 +1,72 @@
-.country-card {
+.meal-card {
   cursor: pointer;
-  transition: transform 0.2s ease-in-out;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
   margin-bottom: 16px;
+  overflow: hidden;
 
   &:hover {
-    transform: translateY(-2px);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   }
 }
 
-.flag-small {
-  height: 60px;
-  width: 100px;
+.meal-thumb {
+  height: 150px;
+  width: 100%;
   object-fit: cover;
   border-radius: 4px;
   margin-bottom: 8px;
 }
 
-.flag-large {
-  height: 120px;
-  width: 200px;
+.meal-image {
+  height: 200px;
+  width: 100%;
   object-fit: cover;
-  border-radius: 8px;
-  margin: 16px auto;
-  display: block;
+  border-radius: 8px 8px 0 0;
+  margin: -16px -16px 16px -16px;
 }
 
-.country-detail {
+.meal-detail {
   .back-button {
     margin-bottom: 16px;
   }
 
-  .official-name {
-    font-size: 1rem;
-    color: var(--ion-color-medium);
-    font-weight: normal;
+  .ingredients-list {
+    list-style-type: none;
+    padding: 0;
+
+    li {
+      padding: 4px 0;
+      border-bottom: 1px solid var(--ion-color-light-shade);
+    }
+  }
+
+  .tags {
+    margin: 16px 0;
+
+    ion-badge {
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+  }
+
+  .youtube-link, .source-link {
+    margin-top: 16px;
   }
 }
 
 .no-results, .loading {
   text-align: center;
   padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   ion-icon {
     color: var(--ion-color-medium);
     margin-bottom: 16px;
+    font-size: 48px;
   }
 
   h3 {
@@ -53,7 +76,11 @@
 
   p {
     color: var(--ion-color-medium);
-    margin: 0;
+    margin: 0 0 16px 0;
+  }
+
+  ion-spinner {
+    margin-bottom: 16px;
   }
 }
 
@@ -61,10 +88,19 @@ ion-searchbar {
   margin-bottom: 16px;
 }
 
+ion-item {
+  margin-bottom: 16px;
+}
+
+ion-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
 // Responsive design
 @media (max-width: 576px) {
-  .flag-large {
-    height: 80px;
-    width: 150px;
+  .meal-detail ion-card-content {
+    padding-top: 16px;
   }
 }

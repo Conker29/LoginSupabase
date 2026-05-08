@@ -3,48 +3,33 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import {
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonCard,
-  IonCardContent,
-  IonCardHeader,
-  IonCardTitle,
-  IonCardSubtitle,
-  IonButton,
-  IonIcon,
-  IonSearchbar,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonImg
+  IonHeader, IonToolbar, IonTitle, IonContent,
+  IonCard, IonCardContent, IonCardHeader, IonCardTitle,
+  IonCardSubtitle, IonButton, IonIcon, IonSearchbar,
+  IonGrid, IonRow, IonCol, IonImg, IonSpinner, IonBadge,
+  IonSelect, IonSelectOption, IonLabel, IonItem
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { searchOutline, flagOutline } from 'ionicons/icons';
+import { searchOutline, starOutline, logoYoutube, linkOutline, alertCircleOutline } from 'ionicons/icons';
 
-interface Country {
-  name: {
-    common: string;
-    official: string;
-    nativeName?: any;
-  };
-  capital?: string[];
-  region: string;
-  subregion?: string;
-  population: number;
-  area: number;
-  flags: {
-    png: string;
-    svg: string;
-  };
-  languages?: any;
-  currencies?: any;
-  borders?: string[];
-  timezones: string[];
-  continents: string[];
-  independent: boolean;
-  unMember: boolean;
+interface Meal {
+  idMeal: string;
+  strMeal: string;
+  strCategory: string;
+  strArea: string;
+  strInstructions: string;
+  strMealThumb: string;
+  strTags?: string;
+  strYoutube?: string;
+  strSource?: string;
+  [key: string]: any;
+}
+
+interface Category {
+  idCategory: string;
+  strCategory: string;
+  strCategoryThumb: string;
+  strCategoryDescription: string;
 }
 
 @Component({
@@ -53,91 +38,146 @@ interface Country {
   styleUrls: ['./tab1.page.scss'],
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
-    IonContent,
-    IonCard,
-    IonCardContent,
-    IonCardHeader,
-    IonCardTitle,
-    IonCardSubtitle,
-    IonButton,
-    IonIcon,
-    IonSearchbar,
-    IonGrid,
-    IonRow,
-    IonCol,
-    IonImg
+    CommonModule, FormsModule,
+    IonHeader, IonToolbar, IonTitle, IonContent,
+    IonCard, IonCardContent, IonCardHeader, IonCardTitle,
+    IonCardSubtitle, IonButton, IonIcon, IonSearchbar,
+    IonGrid, IonRow, IonCol, IonImg, IonSpinner, IonBadge,
+    IonSelect, IonSelectOption, IonLabel, IonItem
   ]
 })
 export class Tab1Page implements OnInit {
-  countries: Country[] = [];
-  filteredCountries: Country[] = [];
-  selectedCountry: Country | null = null;
+  private readonly MEALDB_BASE_URL = 'https://www.themealdb.com/api/json/v1/1';
+
+  meals: Meal[] = [];
+  filteredMeals: Meal[] = [];
+  selectedMeal: Meal | null = null;
   searchTerm: string = '';
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  categories: Category[] = [];
+  selectedCategory: string = '';
 
   constructor(private http: HttpClient) {
-    addIcons({ searchOutline, flagOutline });
+    addIcons({ searchOutline, starOutline, logoYoutube, linkOutline, alertCircleOutline });
   }
 
   ngOnInit() {
-    this.loadAllCountries();
+    this.loadCategories();
+    this.loadMeals();
   }
 
-  loadAllCountries() {
-    this.http.get<Country[]>('https://restcountries.com/v3.1/name/{name}').subscribe({
+  loadCategories() {
+    const url = `${this.MEALDB_BASE_URL}/categories.php`;
+    this.http.get<any>(url).subscribe({
       next: (data) => {
-        this.countries = data;
-        this.filteredCountries = data;
+        this.categories = data.categories || [];
       },
-      error: (error) => {
-        console.error('Error loading countries:', error);
+      error: (err) => {
+        console.error('Error loading categories:', err);
+      }
+    });
+  }
+
+  loadMeals(category?: string) {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    let url = `${this.MEALDB_BASE_URL}/search.php?s=`;
+    if (category) {
+      url = `${this.MEALDB_BASE_URL}/filter.php?c=${category}`;
+    }
+
+    this.http.get<any>(url).subscribe({
+      next: (data) => {
+        this.meals = data.meals || [];
+        this.filteredMeals = this.meals;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading meals:', err);
+        this.errorMessage = 'Error al cargar recetas';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  searchMeals() {
+    if (!this.searchTerm.trim()) {
+      this.loadMeals(this.selectedCategory);
+      return;
+    }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const url = `${this.MEALDB_BASE_URL}/search.php?s=${encodeURIComponent(this.searchTerm)}`;
+    this.http.get<any>(url).subscribe({
+      next: (data) => {
+        this.filteredMeals = data.meals || [];
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error searching meals:', err);
+        this.errorMessage = 'Error en la búsqueda';
+        this.isLoading = false;
       }
     });
   }
 
   onSearchChange(event: any) {
     this.searchTerm = event.detail.value || '';
-    this.filterCountries();
-  }
-
-  filterCountries() {
-    if (!this.searchTerm.trim()) {
-      this.filteredCountries = this.countries;
-      return;
+    if (this.searchTerm.length > 2) {
+      this.searchMeals();
+    } else if (this.searchTerm.length === 0) {
+      this.loadMeals(this.selectedCategory);
     }
-
-    const term = this.searchTerm.toLowerCase();
-    this.filteredCountries = this.countries.filter(country =>
-      country.name.common.toLowerCase().includes(term) ||
-      country.name.official.toLowerCase().includes(term) ||
-      (country.capital && country.capital.some(cap => cap.toLowerCase().includes(term)))
-    );
   }
 
-  selectCountry(country: Country) {
-    this.selectedCountry = country;
+  onCategoryChange(event: any) {
+    this.selectedCategory = event.detail.value;
+    this.loadMeals(this.selectedCategory);
+  }
+
+  selectMeal(meal: Meal) {
+    this.isLoading = true;
+    // If it's a filter result, load full details
+    if (!meal.strInstructions) {
+      const url = `${this.MEALDB_BASE_URL}/lookup.php?i=${meal.idMeal}`;
+      this.http.get<any>(url).subscribe({
+        next: (data) => {
+          this.selectedMeal = data.meals[0];
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Error loading meal details:', err);
+          this.errorMessage = 'Error al cargar detalles de la receta';
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.selectedMeal = meal;
+      this.isLoading = false;
+    }
   }
 
   clearSelection() {
-    this.selectedCountry = null;
+    this.selectedMeal = null;
   }
 
-  formatNumber(num: number): string {
-    return num.toLocaleString();
+  getIngredients(meal: Meal): string[] {
+    const ingredients = [];
+    for (let i = 1; i <= 20; i++) {
+      const ing = meal[`strIngredient${i}`];
+      const measure = meal[`strMeasure${i}`];
+      if (ing && ing.trim()) {
+        ingredients.push(`${measure} ${ing}`.trim());
+      }
+    }
+    return ingredients;
   }
 
-  getLanguages(languages: any): string {
-    if (!languages) return 'N/A';
-    return Object.values(languages).join(', ');
-  }
-
-  getCurrencies(currencies: any): string {
-    if (!currencies) return 'N/A';
-    return Object.values(currencies).map((curr: any) => curr.name).join(', ');
+  getImageUrl(url: string): string {
+    return url || 'assets/icon/favicon.png';
   }
 }
-

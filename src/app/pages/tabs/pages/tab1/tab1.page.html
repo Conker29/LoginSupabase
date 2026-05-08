@@ -1,51 +1,77 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Países del Mundo</ion-title>
+    <ion-title>Recetas</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <!-- Barra de búsqueda -->
   <ion-searchbar
-    placeholder="Buscar país..."
+    placeholder="Buscar receta..."
     [(ngModel)]="searchTerm"
     (ionInput)="onSearchChange($event)">
   </ion-searchbar>
 
-  <!-- País seleccionado - Vista detallada -->
-  <div *ngIf="selectedCountry" class="country-detail">
+  <!-- Filtro por categoría -->
+  <ion-item *ngIf="categories.length > 0">
+    <ion-label>Categoría</ion-label>
+    <ion-select [(ngModel)]="selectedCategory" (ionChange)="onCategoryChange($event)" placeholder="Todas las categorías">
+      <ion-select-option value="">Todas las categorías</ion-select-option>
+      <ion-select-option *ngFor="let category of categories" [value]="category.strCategory">
+        {{ category.strCategory }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Receta seleccionada - Vista detallada -->
+  <div *ngIf="selectedMeal" class="meal-detail">
     <ion-button fill="clear" (click)="clearSelection()" class="back-button">
       ← Volver a la lista
     </ion-button>
 
-    <ion-card class="country-card">
+    <ion-card class="meal-card">
+      <ion-img [src]="getImageUrl(selectedMeal.strMealThumb)" alt="Imagen de la receta" class="meal-image"></ion-img>
+
       <ion-card-header>
-        <ion-img [src]="selectedCountry.flags.png" alt="Bandera" class="flag-large"></ion-img>
-        <ion-card-title>{{ selectedCountry.name.common }}</ion-card-title>
-        <ion-card-title class="official-name">{{ selectedCountry.name.official }}</ion-card-title>
+        <ion-card-title>{{ selectedMeal.strMeal }}</ion-card-title>
+        <ion-card-subtitle>{{ selectedMeal.strCategory }} - {{ selectedMeal.strArea }}</ion-card-subtitle>
       </ion-card-header>
 
       <ion-card-content>
         <ion-grid>
           <ion-row>
             <ion-col size="12" size-md="6">
-              <h3>Información General</h3>
-              <p><strong>Capital:</strong> {{ selectedCountry.capital?.[0] || 'N/A' }}</p>
-              <p><strong>Región:</strong> {{ selectedCountry.region }}</p>
-              <p><strong>Subregión:</strong> {{ selectedCountry.subregion || 'N/A' }}</p>
-              <p><strong>Continente:</strong> {{ selectedCountry.continents?.[0] || 'N/A' }}</p>
-              <p><strong>Población:</strong> {{ formatNumber(selectedCountry.population) }}</p>
-              <p><strong>Área:</strong> {{ formatNumber(selectedCountry.area) }} km²</p>
+              <h3>Ingredientes</h3>
+              <ul class="ingredients-list">
+                <li *ngFor="let ingredient of getIngredients(selectedMeal)">
+                  {{ ingredient }}
+                </li>
+              </ul>
             </ion-col>
 
             <ion-col size="12" size-md="6">
-              <h3>Información Adicional</h3>
-              <p><strong>Idiomas:</strong> {{ getLanguages(selectedCountry.languages) }}</p>
-              <p><strong>Monedas:</strong> {{ getCurrencies(selectedCountry.currencies) }}</p>
-              <p><strong>Zonas horarias:</strong> {{ selectedCountry.timezones?.join(', ') || 'N/A' }}</p>
-              <p><strong>Países limítrofes:</strong> {{ selectedCountry.borders?.length || 0 }}</p>
-              <p><strong>Independiente:</strong> {{ selectedCountry.independent ? 'Sí' : 'No' }}</p>
-              <p><strong>Miembro ONU:</strong> {{ selectedCountry.unMember ? 'Sí' : 'No' }}</p>
+              <h3>Instrucciones</h3>
+              <p>{{ selectedMeal.strInstructions }}</p>
+
+              <div *ngIf="selectedMeal.strTags" class="tags">
+                <ion-badge *ngFor="let tag of selectedMeal.strTags.split(',')" color="primary">
+                  {{ tag.trim() }}
+                </ion-badge>
+              </div>
+
+              <div *ngIf="selectedMeal.strYoutube" class="youtube-link">
+                <ion-button fill="outline" href="{{ selectedMeal.strYoutube }}" target="_blank">
+                  <ion-icon name="logo-youtube" slot="start"></ion-icon>
+                  Ver en YouTube
+                </ion-button>
+              </div>
+
+              <div *ngIf="selectedMeal.strSource" class="source-link">
+                <ion-button fill="outline" href="{{ selectedMeal.strSource }}" target="_blank">
+                  <ion-icon name="link-outline" slot="start"></ion-icon>
+                  Fuente original
+                </ion-button>
+              </div>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -53,20 +79,19 @@
     </ion-card>
   </div>
 
-  <!-- Lista de países -->
-  <div *ngIf="!selectedCountry">
-    <ion-grid *ngIf="filteredCountries.length > 0">
+  <!-- Lista de recetas -->
+  <div *ngIf="!selectedMeal">
+    <ion-grid *ngIf="filteredMeals.length > 0">
       <ion-row>
-        <ion-col size="12" size-sm="6" size-md="4" *ngFor="let country of filteredCountries">
-          <ion-card class="country-card" (click)="selectCountry(country)">
-            <ion-img [src]="country.flags.png" alt="Bandera" class="flag-small"></ion-img>
+        <ion-col size="12" size-sm="6" size-md="4" *ngFor="let meal of filteredMeals">
+          <ion-card class="meal-card" (click)="selectMeal(meal)">
+            <ion-img [src]="getImageUrl(meal.strMealThumb)" alt="Imagen de la receta" class="meal-thumb"></ion-img>
             <ion-card-header>
-              <ion-card-title>{{ country.name.common }}</ion-card-title>
-              <ion-card-subtitle>{{ country.capital?.[0] || 'Sin capital' }}</ion-card-subtitle>
+              <ion-card-title>{{ meal.strMeal }}</ion-card-title>
+              <ion-card-subtitle>{{ meal.strCategory }}</ion-card-subtitle>
             </ion-card-header>
             <ion-card-content>
-              <p><strong>Región:</strong> {{ country.region }}</p>
-              <p><strong>Población:</strong> {{ formatNumber(country.population) }}</p>
+              <p><strong>Origen:</strong> {{ meal.strArea }}</p>
             </ion-card-content>
           </ion-card>
         </ion-col>
@@ -74,16 +99,23 @@
     </ion-grid>
 
     <!-- Mensaje cuando no hay resultados -->
-    <div *ngIf="filteredCountries.length === 0 && searchTerm" class="no-results">
+    <div *ngIf="filteredMeals.length === 0 && searchTerm" class="no-results">
       <ion-icon name="search-outline" size="large"></ion-icon>
-      <h3>No se encontraron países</h3>
+      <h3>No se encontraron recetas</h3>
       <p>Intenta con otro término de búsqueda</p>
     </div>
 
-    <!-- Mensaje de carga inicial -->
-    <div *ngIf="countries.length === 0" class="loading">
-      <ion-icon name="flag-outline" size="large"></ion-icon>
-      <h3>Cargando países...</h3>
+    <!-- Spinner de carga -->
+    <div *ngIf="isLoading" class="loading">
+      <ion-spinner name="crescent"></ion-spinner>
+      <h3>Cargando recetas...</h3>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="errorMessage" class="no-results">
+      <ion-icon name="alert-circle-outline" size="large"></ion-icon>
+      <h3>{{ errorMessage }}</h3>
+      <ion-button (click)="loadMeals()">Reintentar</ion-button>
     </div>
   </div>
 </ion-content>
