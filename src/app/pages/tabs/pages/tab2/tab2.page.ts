@@ -46,9 +46,10 @@ export class Tab2Page {
   async takePicture() {
     try {
       const capturedPhoto = await Camera.getPhoto({
-        resultType: CameraResultType.Uri,
+        resultType: CameraResultType.DataUrl,
         source: CameraSource.Camera,
-        quality: 100
+        quality: 100,
+        saveToGallery: true
       });
 
       const savedImageFile = await this.savePicture(capturedPhoto);
@@ -60,7 +61,7 @@ export class Tab2Page {
   }
 
   private async savePicture(cameraPhoto: any): Promise<UserPhoto> {
-    const base64Data = await this.readAsBase64(cameraPhoto);
+    const base64Data = cameraPhoto.dataUrl;
 
     const fileName = new Date().getTime() + '.jpeg';
     const savedFile = await Filesystem.writeFile({
@@ -71,25 +72,9 @@ export class Tab2Page {
 
     return {
       fileName,
-      webviewPath: cameraPhoto.webPath
+      webviewPath: cameraPhoto.dataUrl
     };
   }
-
-  private async readAsBase64(cameraPhoto: any) {
-    const response = await fetch(cameraPhoto.webPath!);
-    const blob = await response.blob();
-
-    return await this.convertBlobToBase64(blob) as string;
-  }
-
-  private convertBlobToBase64 = (blob: Blob) => new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onerror = reject;
-    reader.onload = () => {
-      resolve(reader.result);
-    };
-    reader.readAsDataURL(blob);
-  });
 
   private async showAlert(header: string, message: string) {
     const alert = await this.alertController.create({
