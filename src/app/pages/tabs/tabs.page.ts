@@ -15,4 +15,8 @@ import {
   standalone: true,
   imports: [IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel]
 })
-export class TabsPage {}
+export class TabsPage {
+  
+  constructor() {}
+
+}

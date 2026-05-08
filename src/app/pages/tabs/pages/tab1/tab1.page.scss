@@ -1,0 +1,70 @@
+.country-card {
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  margin-bottom: 16px;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.flag-small {
+  height: 60px;
+  width: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.flag-large {
+  height: 120px;
+  width: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 16px auto;
+  display: block;
+}
+
+.country-detail {
+  .back-button {
+    margin-bottom: 16px;
+  }
+
+  .official-name {
+    font-size: 1rem;
+    color: var(--ion-color-medium);
+    font-weight: normal;
+  }
+}
+
+.no-results, .loading {
+  text-align: center;
+  padding: 40px 20px;
+
+  ion-icon {
+    color: var(--ion-color-medium);
+    margin-bottom: 16px;
+  }
+
+  h3 {
+    color: var(--ion-color-medium);
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin: 0;
+  }
+}
+
+ion-searchbar {
+  margin-bottom: 16px;
+}
+
+// Responsive design
+@media (max-width: 576px) {
+  .flag-large {
+    height: 80px;
+    width: 150px;
+  }
+}
