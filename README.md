@@ -180,3 +180,8 @@ src/
 
 **`npx cap sync` muestra errores**
 → Asegúrate de haber ejecutado `ionic build` primero para generar la carpeta `www/`.
+
+
+Utilzacion de la IA
+<img width="893" height="347" alt="image" src="https://github.com/user-attachments/assets/38ecb957-b3a7-4887-a456-a51de11a5aa3" />
+Escritura de README
