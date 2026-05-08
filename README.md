@@ -166,6 +166,14 @@ src/
 
 **La cámara no funciona en el navegador**
 → Es un comportamiento esperado. Capacitor Camera requiere un entorno nativo (Android/iOS).
+<img width="1080" height="2460" alt="image" src="https://github.com/user-attachments/assets/7c745869-2648-473f-aaeb-d28a16a38359" />
+<img width="702" height="1600" alt="image" src="https://github.com/user-attachments/assets/fc46fdd2-e53d-4c43-a69d-005ac6cea7ca" />
+<img width="702" height="1600" alt="image" src="https://github.com/user-attachments/assets/eb9d9096-8dff-4bde-91c8-3a4c2cccb81d" />
+<img width="1200" height="1599" alt="image" src="https://github.com/user-attachments/assets/cd5f5f62-8c00-49e1-a3e6-2881b9933a83" />
+<img width="1080" height="2460" alt="image" src="https://github.com/user-attachments/assets/f3764993-444a-43a8-a9a8-926daa855cd6" />
+
+
+
 
 **Error de CORS al consumir la API**
 → Ocurre solo en desarrollo web con ciertas APIs. En producción (app nativa) no sucede.
