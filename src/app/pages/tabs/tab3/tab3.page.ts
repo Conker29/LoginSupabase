@@ -14,6 +14,8 @@ import {
   IonButton,
   IonIcon
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { logOutOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tab3',
@@ -37,7 +39,9 @@ export class Tab3Page {
   constructor(
     private supabaseService: SupabaseService,
     private router: Router
-  ) {}
+  ) {
+    addIcons({ logOutOutline });
+  }
 
   async logout() {
     try {

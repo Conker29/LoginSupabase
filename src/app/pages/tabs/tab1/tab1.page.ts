@@ -16,6 +16,9 @@ import {
 } from '@ionic/angular/standalone';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Toast } from '@capacitor/toast';
+import { addIcons } from 'ionicons';
+import { cameraOutline } from 'ionicons/icons';
+
 
 @Component({
   selector: 'app-tab1',
@@ -44,7 +47,9 @@ export class Tab1Page implements OnInit {
   ngOnInit() {
     this.loadPhotos();
   }
-
+  constructor() {
+  addIcons({ cameraOutline });
+}
   async takePhoto() {
     try {
       const photo = await Camera.getPhoto({
